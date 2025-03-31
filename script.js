@@ -2,6 +2,8 @@ const pageInfo = document.getElementById("pageInfo")
 const nextPage = document.getElementById("nextPage")
 const prevPage = document.getElementById("prevPage")
 const toggleViewBtn = document.getElementById("toggle-view")
+const search = document.getElementById("search") 
+const sort = document.getElementById("sort") 
 
 const maxPage = 20;
 let currentPage = 1;
@@ -82,12 +84,14 @@ apiFetchCall(currentPage)
     .then(response => response.data)
     .then((response) => { handleData(response) })
 
+let booksArray;
+
 function handleData(allBooks) {
     const booksContainer = document.getElementById("booksContainer")
     booksContainer.innerHTML = "";
     
     // Now I am having data of books stored in an array
-    const booksArray = allBooks.data;
+    booksArray = allBooks.data;
     console.log(booksArray)
 
     const stringifiedBooksArray = JSON.stringify(booksArray)
@@ -95,6 +99,39 @@ function handleData(allBooks) {
 
     booksArray.forEach(book => { createBookElement(book) });
 }
+
+// Sorting and searching
+
+function filterBooks() {
+    let searchQuery = search.value.toLowerCase();
+
+    let filteredBooks = booksArray.filter(book => 
+        book.volumeInfo.title.toLowerCase().includes(searchQuery)
+    );
+
+    sortBooks(filteredBooks);
+}
+
+
+function sortBooks(filteredBooks) {
+    if (sort.value == "title") {
+        filteredBooks.sort((a, b) => a.volumeInfo.title.localeCompare(b.volumeInfo.title));
+
+    } else if (sort.value == "date") {
+        filteredBooks.sort((a, b) => new Date(b.volumeInfo.publishedDate) - new Date(a.volumeInfo.publishedDate));
+        
+    }
+
+    const booksContainer = document.getElementById("booksContainer");
+    booksContainer.innerHTML = "";
+
+    filteredBooks.forEach(book => createBookElement(book));
+}
+
+
+search.addEventListener("input", filterBooks)
+sort.addEventListener("change", filterBooks)
+
 
 function createBookElement(book) {
     // creating book div (parent)
@@ -182,3 +219,4 @@ function booksDivOnClick(id) {
     localStorage.setItem("bookId", id)
     document.location.href = "booksInfo.html"
 }
+
