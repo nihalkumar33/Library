@@ -4,6 +4,7 @@ const prevPage = document.getElementById("prevPage")
 
 const maxPage = 20;
 let currentPage = 1;
+document.currentPage = currentPage
 
 function pagination(button) {
     console.log("Button: ", button)
