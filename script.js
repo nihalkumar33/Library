@@ -32,24 +32,15 @@ function pagination(button) {
             pageInfo.innerText = `Page ${currentPage}`
         }
     }
+    
+    apiFetchCall(currentPage)
+    .then(response => response.data)
+    .then((response) => { handleData(response) })
 }
 
-nextPage.addEventListener("click", async () => {
-    pagination("next")
+nextPage.addEventListener("click", async () => { pagination("next") })
 
-    apiFetchCall(currentPage)
-        .then(response => response.data)
-        .then((response) => { handleData(response) })
-})
-
-prevPage.addEventListener("click", () => {
-    pagination("prev")
-
-    apiFetchCall(currentPage)
-        .then(response => response.data)
-        .then((response) => { handleData(response) })
-})
-
+prevPage.addEventListener("click", () => { pagination("prev") })
 
 
 const apiFetchCall = async (pageNumber) => {
@@ -76,6 +67,12 @@ function handleData(allBooks) {
     
     // Now I am having data of books stored in an array
     const booksArray = allBooks.data;
+    console.log(booksArray)
+
+    const stringifiedBooksArray = JSON.stringify(booksArray)
+    localStorage.setItem("ApiResponse", stringifiedBooksArray)
+
+    // console.log(stringifiedBooksArray)
 
     booksArray.forEach(book => { createBookElement(book) });
 }
@@ -91,13 +88,10 @@ function createBookElement(book) {
     const identifier = book.volumeInfo.industryIdentifiers[0].identifier
 
     booksDiv.id = `${type}${identifier}`
+    booksDiv.setAttribute("onclick", "booksDivOnClick(id)")
+    booksDiv.setAttribute("style", "cursor: pointer;")
 
     // creating other nested elements
-
-    // anchor tag
-    const linkToDetails = document.createElement("a")
-    linkToDetails.setAttribute('herf', 'booksInfo.html')
-    linkToDetails.setAttribute('style', 'text-decoration: none;')
 
     // book-card
     const card = document.createElement("div")
@@ -148,17 +142,16 @@ function createBookElement(book) {
     cardBody.appendChild(pForPublisher)
     cardBody.appendChild(pForPublishedDate)
 
-    booksDiv.appendChild(linkToDetails)
-    linkToDetails.appendChild(card)
+    booksDiv.appendChild(card)
     card.appendChild(imageTag)
     card.appendChild(cardBody)
 
     console.log(booksDiv)
 
+
     // Adding booksDiv in booksContainer
     booksContainer.appendChild(booksDiv)
 }
-
 
 function createBookInfo(info) {
     const pTag = document.createElement('p')
@@ -168,9 +161,15 @@ function createBookInfo(info) {
     smallTag.innerText = info
     pTag.appendChild(smallTag)
 
+    
     return pTag;
 }
 
+function booksDivOnClick(id) {
+    localStorage.setItem("bookId", id)
+    
+    document.location.href = "booksInfo.html"
+}
 
 
 // data from freeApi
