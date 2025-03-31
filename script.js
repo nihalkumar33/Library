@@ -220,3 +220,4 @@ function booksDivOnClick(id) {
     document.location.href = "booksInfo.html"
 }
 
+
