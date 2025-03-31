@@ -1,10 +1,14 @@
 const pageInfo = document.getElementById("pageInfo")
 const nextPage = document.getElementById("nextPage")
 const prevPage = document.getElementById("prevPage")
+const toggleViewBtn = document.getElementById("toggle-view")
 
 const maxPage = 20;
 let currentPage = 1;
-document.currentPage = currentPage
+document.currentPage = currentPage;
+
+// We'll track whether we are in "grid" mode or "list" mode
+let isGrid = true;
 
 function pagination(button) {
     console.log("Button: ", button)
@@ -12,20 +16,16 @@ function pagination(button) {
     if (button == "prev") {
         if (currentPage == 1) {
             prevPage.disabled = true;
-
         } else {
             prevPage.disabled = false;
             nextPage.disabled = false;
-
             currentPage = currentPage - 1;
             pageInfo.innerText = `Page ${currentPage}`
         }
-
     } else {
         if (currentPage == maxPage) {
             console.log("I am in next at 10 page")
             nextPage.disabled = true;
-
         } else {
             nextPage.disabled = false;
             prevPage.disabled = false;
@@ -40,19 +40,39 @@ function pagination(button) {
 }
 
 nextPage.addEventListener("click", async () => { pagination("next") })
-
 prevPage.addEventListener("click", () => { pagination("prev") })
 
+// Toggle View button
+toggleViewBtn.addEventListener("click", () => {
+    // 1) Switch the layout classes in #booksContainer
+    const books = document.querySelectorAll("#booksContainer > div");
+    if (isGrid) {
+        // Switch from grid to list
+        books.forEach(bookDiv => {
+            bookDiv.classList.remove("col-sm-6", "col-md-4", "col-lg-3");
+            bookDiv.classList.add("col-12");
+        });
+        // 2) Add a body-level class to enable special styling
+        document.body.classList.add("list-view");
+    } else {
+        // Switch from list back to grid
+        books.forEach(bookDiv => {
+            bookDiv.classList.remove("col-12");
+            bookDiv.classList.add("col-sm-6", "col-md-4", "col-lg-3");
+        });
+        document.body.classList.remove("list-view");
+    }
+
+    // Toggle the boolean
+    isGrid = !isGrid;
+});
 
 const apiFetchCall = async (pageNumber) => {
     try {
         URL = `https://api.freeapi.app/api/v1/public/books/?page=${pageNumber}`;
-
         const response = await fetch(URL);
         const data = await response.json();
-
         return data;
-
     } catch (error) {
         console.log(`Error in fetching data: ${error}`)
     }
@@ -72,8 +92,6 @@ function handleData(allBooks) {
 
     const stringifiedBooksArray = JSON.stringify(booksArray)
     localStorage.setItem("ApiResponse", stringifiedBooksArray)
-
-    // console.log(stringifiedBooksArray)
 
     booksArray.forEach(book => { createBookElement(book) });
 }
@@ -102,7 +120,6 @@ function createBookElement(book) {
 
     // image tag
     const smallThumbnail = book.volumeInfo.imageLinks.smallThumbnail;
-
     const imageTag = document.createElement("img")
     imageTag.classList.add('card-img-top')
     imageTag.src = smallThumbnail
@@ -114,7 +131,6 @@ function createBookElement(book) {
 
     // title 
     const titleText = book.volumeInfo.title
-
     const title = document.createElement('h5')
     title.classList.add('card-title')
     title.innerText = titleText
@@ -122,11 +138,9 @@ function createBookElement(book) {
     // author
     const authors = book.volumeInfo.authors
     let authorText = '';
-
     authors.forEach((author) => {
         authorText += `, ${author}`
     })
-
     authorText = authorText.slice(2,);
     const pForAuthor = createBookInfo(`Author: ${authorText}`)
 
@@ -149,7 +163,6 @@ function createBookElement(book) {
 
     console.log(booksDiv)
 
-
     // Adding booksDiv in booksContainer
     booksContainer.appendChild(booksDiv)
 }
@@ -161,31 +174,11 @@ function createBookInfo(info) {
     const smallTag = document.createElement('small')
     smallTag.innerText = info
     pTag.appendChild(smallTag)
-
     
     return pTag;
 }
 
 function booksDivOnClick(id) {
     localStorage.setItem("bookId", id)
-    
     document.location.href = "booksInfo.html"
 }
-
-
-// data from freeApi
-
-
-// const response = async function() {
-//     try {
-//         const response = await fetch(url);
-//         const data = await response.json();
-//         console.log("Inside try")
-
-//         return data;
-
-//     } catch (error) {
-//         console.log(`Error in fetching data: ${error}`)
-//     }
-// }
-
