@@ -1,9 +1,6 @@
 const pageInfo = document.getElementById("pageInfo")
 const nextPage = document.getElementById("nextPage")
 const prevPage = document.getElementById("prevPage")
-const toggleViewBtn = document.getElementById("toggle-view")
-const search = document.getElementById("search") 
-const sort = document.getElementById("sort") 
 
 const maxPage = 20;
 let currentPage = 1;
@@ -219,4 +216,21 @@ function booksDivOnClick(id) {
     localStorage.setItem("bookId", id)
     document.location.href = "booksInfo.html"
 }
+
+
+// data from freeApi
+
+
+// const response = async function() {
+//     try {
+//         const response = await fetch(url);
+//         const data = await response.json();
+//         console.log("Inside try")
+
+//         return data;
+
+//     } catch (error) {
+//         console.log(`Error in fetching data: ${error}`)
+//     }
+// }
 
